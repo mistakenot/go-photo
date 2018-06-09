@@ -10,17 +10,17 @@ import (
 	"testing"
 )
 
-var testImagePath = "test-images/gopher.png"
+var testImagePath = "test-images/test-album/gopher.png"
 var port = "8000"
 
-func TestServerServesImage(t *testing.T) {
+func TestServerServesExistingImage(t *testing.T) {
 	router := New()
 	server := httptest.NewServer(router)
 	basePath := server.URL
 
 	defer server.Close()
 
-	resp, err := http.Get(basePath + "/gopher.png")
+	resp, err := http.Get(basePath + "/test-album/gopher.png")
 
 	if err != nil {
 		t.Error(err)
@@ -49,6 +49,24 @@ func TestServerServesImage(t *testing.T) {
 	}
 }
 
+func TestServerGetNonExistentImage(t *testing.T) {
+	router := New()
+	server := httptest.NewServer(router)
+	basePath := server.URL
+
+	defer server.Close()
+
+	resp, err := http.Get(basePath + "/gopasdfaher.png")
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	if resp.StatusCode != http.StatusNotFound {
+		t.Errorf("Wrong status code %s", resp.Status)
+	}
+}
+
 func TestServerUploadsImage(t *testing.T) {
 	router := New()
 	server := httptest.NewServer(router)
@@ -62,7 +80,7 @@ func TestServerUploadsImage(t *testing.T) {
 		t.Error(err)
 	}
 
-	response, err := http.Post(basePath+"/gopher2.png", "image/png", reader)
+	response, err := http.Post(basePath+"/test-album/gopher2.png", "image/png", reader)
 
 	if err != nil {
 		t.Error(err)
@@ -73,7 +91,7 @@ func TestServerUploadsImage(t *testing.T) {
 		t.Errorf("Wrong status code %s status %s", response.Status, statusBytes)
 	}
 
-	path := path.Join("test-images", "gopher2.png")
+	path := path.Join("test-images", "test-album", "gopher2.png")
 
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		t.Error("File does not exist.")

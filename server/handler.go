@@ -14,7 +14,8 @@ import (
 func GetImage(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	fileName := vars["fileName"]
-	path := path.Join("test-images", fileName)
+	albumName := vars["albumName"]
+	path := path.Join("test-images", albumName, fileName)
 
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		http.NotFound(w, r)
@@ -34,7 +35,8 @@ func GetImage(w http.ResponseWriter, r *http.Request) {
 func CreateImage(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	fileName := vars["fileName"]
-	path := path.Join("test-images", fileName)
+	albumName := vars["albumName"]
+	path := path.Join("test-images", albumName, fileName)
 	_, err := os.Create(path)
 
 	if err != nil {

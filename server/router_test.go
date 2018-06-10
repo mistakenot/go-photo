@@ -2,6 +2,7 @@ package server
 
 import (
 	"bytes"
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -98,4 +99,49 @@ func TestServerUploadsImage(t *testing.T) {
 	}
 
 	defer os.Remove(path)
+}
+
+func TestServerListCollections(t *testing.T) {
+	router := New()
+	server := httptest.NewServer(router)
+	basePath := server.URL
+
+	defer server.Close()
+
+	response, err := http.Get(basePath)
+	responseBytes, err := ioutil.ReadAll(response.Body)
+
+	if response.StatusCode != http.StatusOK {
+		t.Error(response.Status)
+	}
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	model := &AlbumOverview{}
+
+	json.Unmarshal(responseBytes, model)
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	if len(model.Albums) != 1 {
+		t.Errorf("Album is length %d instead of 1.", len(model.Albums))
+	}
+
+	album := model.Albums[0]
+
+	if album.Name != "test-album" {
+		t.Errorf("File has wrong name %s", album.Name)
+	}
+
+	if album.Count != 1 {
+		t.Errorf("Album has wrong count %d.", album.Count)
+	}
+
+	if album.Size == 0 {
+		t.Errorf("Album has wrong size %d.", album.Size)
+	}
 }

@@ -10,6 +10,7 @@ import (
 func New() http.Handler {
 	router := mux.NewRouter()
 
+	router.HandleFunc("/", GetAlbumOverview).Methods("GET")
 	router.HandleFunc("/{albumName}/{fileName}", GetImage).Methods("GET")
 	router.HandleFunc("/{albumName}/{fileName}", CreateImage).Methods("POST")
 

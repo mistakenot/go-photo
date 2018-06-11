@@ -49,6 +49,61 @@ func CreateImage(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 }
 
+// GetAlbum returns a summary of an album if it exists.
+func GetAlbum(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	albumName := vars["albumName"]
+
+	if albumName == "" {
+		http.NotFound(w, r)
+		return
+	}
+
+	path := path.Join("test-images", albumName)
+
+	if _, err := os.Stat(path); err != nil {
+		http.NotFound(w, r)
+		return
+	}
+
+	_, err := ioutil.ReadDir(path)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	files, err := ioutil.ReadDir(path)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	size := 0
+	names := make([]string, len(files))
+
+	for i := 0; i < len(files); i++ {
+		size += int(files[i].Size())
+		names[i] = files[i].Name()
+	}
+
+	album := Album{
+		Name:  albumName,
+		Size:  size,
+		Count: len(files),
+		Files: names}
+
+	bytes, err := json.Marshal(album)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	w.Write(bytes)
+}
+
 // GetAlbumOverview returns a summary of all albums.
 func GetAlbumOverview(w http.ResponseWriter, r *http.Request) {
 	files, err := ioutil.ReadDir("./test-images")
@@ -67,10 +122,18 @@ func GetAlbumOverview(w http.ResponseWriter, r *http.Request) {
 
 		}
 
+		albumFileNames := make([]string, len(photos))
+
+		for y := 0; y < len(photos); y++ {
+			albumFileNames[y] = photos[y].Name()
+		}
+
 		albums[i] = Album{
 			Name:  files[i].Name(),
 			Size:  int(files[i].Size()),
-			Count: len(photos)}
+			Count: len(photos),
+			Files: albumFileNames}
+
 		size += int(files[i].Size())
 	}
 

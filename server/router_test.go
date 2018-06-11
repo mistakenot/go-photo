@@ -57,7 +57,7 @@ func TestServerGetNonExistentImage(t *testing.T) {
 
 	defer server.Close()
 
-	resp, err := http.Get(basePath + "/gopasdfaher.png")
+	resp, err := http.Get(basePath + "/test-image/gopasdfaher.png")
 
 	if err != nil {
 		t.Error(err)
@@ -99,6 +99,68 @@ func TestServerUploadsImage(t *testing.T) {
 	}
 
 	defer os.Remove(path)
+}
+
+func TestServerGetExistingAlbum(t *testing.T) {
+	router := New()
+	server := httptest.NewServer(router)
+	basePath := server.URL
+
+	defer server.Close()
+
+	resp, err := http.Get(basePath + "/test-album")
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	if resp.StatusCode != 200 {
+		t.Errorf("Http code %s", resp.Status)
+	}
+
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	model := &Album{}
+
+	json.Unmarshal(body, model)
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	if model.Count != 1 {
+		t.Errorf("Album is length %d instead of 1.", model.Count)
+	}
+
+	if model.Name != "test-album" {
+		t.Errorf("Image name %s is wrong.", model.Name)
+	}
+}
+
+func TestServerGetNonExistentAlbum(t *testing.T) {
+	router := New()
+	server := httptest.NewServer(router)
+	basePath := server.URL
+
+	defer server.Close()
+
+	resp, err := http.Get(basePath + "/test-album-sadfa")
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	if resp.StatusCode != 404 {
+		t.Errorf("Http code %s", resp.Status)
+	}
+
+	defer resp.Body.Close()
 }
 
 func TestServerListCollections(t *testing.T) {
@@ -144,4 +206,9 @@ func TestServerListCollections(t *testing.T) {
 	if album.Size == 0 {
 		t.Errorf("Album has wrong size %d.", album.Size)
 	}
+
+	if album.Files[0] != "gopher.png" {
+		t.Errorf("Album has wrong filename %s", album.Files[0])
+	}
+
 }

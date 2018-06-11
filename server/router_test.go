@@ -3,6 +3,7 @@ package server
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -21,7 +22,7 @@ func TestServerServesExistingImage(t *testing.T) {
 
 	defer server.Close()
 
-	resp, err := http.Get(basePath + "/test-album/gopher.png")
+	resp, err := http.Get(basePath + "/api/test-album/gopher.png")
 
 	if err != nil {
 		t.Error(err)
@@ -57,7 +58,7 @@ func TestServerGetNonExistentImage(t *testing.T) {
 
 	defer server.Close()
 
-	resp, err := http.Get(basePath + "/test-image/gopasdfaher.png")
+	resp, err := http.Get(basePath + "/api/test-image/gopasdfaher.png")
 
 	if err != nil {
 		t.Error(err)
@@ -81,7 +82,7 @@ func TestServerUploadsImage(t *testing.T) {
 		t.Error(err)
 	}
 
-	response, err := http.Post(basePath+"/test-album/gopher2.png", "image/png", reader)
+	response, err := http.Post(basePath+"/api/test-album/gopher2.png", "image/png", reader)
 
 	if err != nil {
 		t.Error(err)
@@ -108,7 +109,7 @@ func TestServerGetExistingAlbum(t *testing.T) {
 
 	defer server.Close()
 
-	resp, err := http.Get(basePath + "/test-album")
+	resp, err := http.Get(basePath + "/api/test-album")
 
 	if err != nil {
 		t.Error(err)
@@ -141,6 +142,14 @@ func TestServerGetExistingAlbum(t *testing.T) {
 	if model.Name != "test-album" {
 		t.Errorf("Image name %s is wrong.", model.Name)
 	}
+
+	if model.URL != fmt.Sprintf("%s/api/test-album", basePath) {
+		t.Errorf("Image name %s is wrong.", model.URL)
+	}
+
+	if model.Thumbnail != fmt.Sprintf("%s/api/test-album/gopher.png", basePath) {
+		t.Errorf("Image thumbnail %s is wrong.", model.Thumbnail)
+	}
 }
 
 func TestServerGetNonExistentAlbum(t *testing.T) {
@@ -150,7 +159,7 @@ func TestServerGetNonExistentAlbum(t *testing.T) {
 
 	defer server.Close()
 
-	resp, err := http.Get(basePath + "/test-album-sadfa")
+	resp, err := http.Get(basePath + "/api/test-album-sadfa")
 
 	if err != nil {
 		t.Error(err)
@@ -170,7 +179,7 @@ func TestServerListCollections(t *testing.T) {
 
 	defer server.Close()
 
-	response, err := http.Get(basePath)
+	response, err := http.Get(basePath + "/api")
 	responseBytes, err := ioutil.ReadAll(response.Body)
 
 	if response.StatusCode != http.StatusOK {

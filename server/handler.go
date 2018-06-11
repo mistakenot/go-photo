@@ -92,7 +92,12 @@ func GetAlbum(w http.ResponseWriter, r *http.Request) {
 		Name:  albumName,
 		Size:  size,
 		Count: len(files),
-		Files: names}
+		Files: names,
+		URL:   fmt.Sprintf("http://%s%s", r.Host, r.URL.Path)}
+
+	if album.Count > 0 {
+		album.Thumbnail = fmt.Sprintf("http://%s%s/%s", r.Host, r.URL.Path, names[0])
+	}
 
 	bytes, err := json.Marshal(album)
 
@@ -132,7 +137,12 @@ func GetAlbumOverview(w http.ResponseWriter, r *http.Request) {
 			Name:  files[i].Name(),
 			Size:  int(files[i].Size()),
 			Count: len(photos),
-			Files: albumFileNames}
+			Files: albumFileNames,
+			URL:   fmt.Sprintf("http://%s/api/%s", r.Host, files[i].Name())}
+
+		if albums[i].Count > 0 {
+			albums[i].Thumbnail = fmt.Sprintf("http://%s/api/%s/%s", r.Host, files[i].Name(), albumFileNames[0])
+		}
 
 		size += int(files[i].Size())
 	}

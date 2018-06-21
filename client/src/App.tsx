@@ -6,17 +6,16 @@ import { Navigation } from './navigation';
 import { BrowserRouter, Route } from 'react-router-dom';
 import { Home } from './home';
 import { Album } from './album';
+import { GlobalProps } from '.';
 
-const URL = "http://localhost:8000/api"
-
-export const App: React.SFC<{}> = () => (
+export const App: React.SFC<GlobalProps> = (props) => (
     <BrowserRouter>
         <div className="container">
             <Navigation />
             <hr />
             <br />
-            <Route exact path='/' render={(props) => <Home {...props} url={URL}/>} />
-            <Route path='/:album' component={Album} />
+            <Route exact path='/' render={(p) => <Home {...props} {...p} />} />
+            <Route path='/:album' render={(p) => <Album {...props} {...p} />} />
         </div>
     </BrowserRouter>);
 

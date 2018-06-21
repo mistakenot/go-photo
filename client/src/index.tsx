@@ -8,8 +8,13 @@ import 'font-awesome/css/font-awesome.min.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'mdbreact/dist/css/mdb.css';
 
+export interface GlobalProps {
+    baseUrl: string;
+    apiUrl: string;
+}
+
 ReactDOM.render(
-  <App />,
+  <App baseUrl="http://localhost:8000/" apiUrl="http://localhost:8000/api" />,
   document.getElementById('root') as HTMLElement
 );
 registerServiceWorker();

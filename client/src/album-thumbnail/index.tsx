@@ -12,6 +12,7 @@ export interface IAlbum {
     count: number
     url: string
     thumbnail: string
+    files: string[]
 }
 
 export interface IAlbumThumbnailProps {

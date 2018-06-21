@@ -2,15 +2,15 @@ import * as React from 'react';
 import { match } from 'react-router-dom';
 import { IAlbum } from '../album-thumbnail';
 import { AlbumThumbnailCollection } from '../album-thumbnail-collection';
+import { GlobalProps } from '..';
 
 interface IAlbumOverview {
     albums: IAlbum[]
 }
 
 
-interface Props {
+interface Props extends GlobalProps {
     match: match<{}>;
-    url: string;
 }
 
 export class Home extends React.Component<Props, IAlbumOverview> {
@@ -24,7 +24,7 @@ export class Home extends React.Component<Props, IAlbumOverview> {
     }
 
     public componentDidMount() {
-        fetch(this.props.url).then(async result => {
+        fetch(this.props.apiUrl).then(async result => {
             const overview = await result.json()
             const state =  overview as IAlbumOverview
             console.log(state)

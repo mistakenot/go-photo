@@ -15,7 +15,7 @@ func New() http.Handler {
 	router.HandleFunc("/api/{albumName}/{fileName}", GetImage).Methods("GET")
 	router.HandleFunc("/api/{albumName}/{fileName}", CreateImage).Methods("POST")
 
-	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./server/public")))
+	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./test-images")))
 
 	return router
 }
